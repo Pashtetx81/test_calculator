@@ -37,6 +37,13 @@ final class Members { // создаем класс Member, что бы возв�
         return sign;
     }
 }
+
+class MyException extends Exception { //создаем класс своих исключений который расширяет класс Exception
+    public MyException(String mesage)
+    {
+        super(mesage);
+    }
+}
 public class Main {
     public static void main(String[] args) {
     Scanner scan = new Scanner(System.in); //создаем объект класса сканер, что бы поместить в него введенную строку.
@@ -48,7 +55,7 @@ public class Main {
            }
           public static String calc(int x, int y, char z) { //основной метод вычисления выражения
            int ii=-1;
-           String output="не верный формат данных"; // общий ответ на ошибку, без уточнения
+           String output=" "; // общий ответ на ошибку, без уточнения
               if (z=='+') { //проверка символа и выполнение соответсвующей операции. Буквенные символы соответсвуют операциям с римскими цифрами
               ii=x+y;
               output = String.valueOf (ii);
@@ -101,16 +108,26 @@ public class Main {
     static int arabStrToInt (String input) {
         int i=-1; //попытка перевести строку в число. Если перевод завершился ошибкой или числом вне диапазона, то
                   //выдается число "-1" - которое, в дальнейше программе интерпретируем как ошибку ввода данных.
+
         try
         {
             i = Integer.parseInt(input);
+
             if (i<1 || i>10) {
-              i=-1;
+                throw new MyException("");
+                //i=-1;
             }
         }
         catch (NumberFormatException nfe)
-        {
-            return i;
+        {  //nfe.printStackTrace();
+           System.out.println("throws Exception //введенные символы не являются числами или выходят за допустимый диапазон");
+            System.exit(1);
+        }
+        catch (MyException e) {
+            //e.printStackTrace();
+            //System.out.println(e.getMessage());
+            System.out.println("throws Exception //введенные символы не являются числами или выходят за допустимый диапазон");
+            System.exit(1);
         }
         return i;
     }
@@ -149,7 +166,28 @@ public class Main {
 
     static String intStrToRim (int input) { // преобразование int числа римские цифры Максимально возможно число по условиям программы это 100 (10х10)
         String i = "";   // в случае любой ошибки возврат числа "-1"
-        if (input<1 || input > 100) return i = "~"; //символ ошибки, для дальнейшей обработки. И конец работы метода.
+
+        /*try {
+            if (z=='|') {
+                throw new MyException("//т.к. формат математической операции не удовлетворяет заданию - два операнда и один оператор (+, -, /, *)");
+            }
+        }
+        catch (MyException e) {
+            e.printStackTrace();
+            //System.out.println(e.getMessage());
+            System.exit(1);
+        }*/
+      try {
+          if (input < 1) //(input < 1 || input > 100)
+              throw new MyException("");
+             //return i = "~"; //символ ошибки, для дальнейшей обработки. И конец работы метода.
+      }
+      catch (MyException e) {
+          //e.printStackTrace();
+          System.out.println("throws Exception //т.к. в римской системе нет отрицательных чисел");
+          System.exit(1);
+      }
+
         if (input==100) return i = "C";
 
         while (input >= 90) {
@@ -199,15 +237,16 @@ public class Main {
 
                String [] strs = input.split("\\+"); //разделяем строку по символу "+". Две косые нужны, что бы система не воспринимала его как регулярный символ.
                 if (strs.length==2) { //после разделения должно быть 2 члена;
-                    x = arabStrToInt(strs[0]); //пытаемся преобразовать арабские циры.
-                    y = arabStrToInt(strs[1]);
-                    z = '+';
+                    x = rimStrToInt(strs[0]); //пытаемся преобразовать арабские циры.
+                    y = rimStrToInt(strs[1]);
+                    z = 'P';
+                    
 
                     //System.out.println("" +" "+x+" "+y+" "+z);
                     if (x == -1 || y == -1) { //если хоть одно число не корректно, то проверяем римские
-                        x = rimStrToInt(strs[0]);
-                        y = rimStrToInt(strs[1]);
-                        z = 'P';
+                        x = arabStrToInt(strs[0]);
+                        y = arabStrToInt(strs[1]);
+                        z = '+';
                     }
                     if (x == -1 || y == -1) { //проверяем на корректность римские.
                         x = -1;
@@ -218,13 +257,13 @@ public class Main {
         } else     if (input.indexOf("-") > 0) {
             String [] strs = input.split("-");
             if (strs.length==2) {
-                x = arabStrToInt(strs[0]);
-                y = arabStrToInt(strs[1]);
-                z = '-';
+                x = rimStrToInt(strs[0]);
+                y = rimStrToInt(strs[1]);
+                z = 'M';
                 if (x == -1 || y == -1) {
-                    x = rimStrToInt(strs[0]);
-                    y = rimStrToInt(strs[1]);
-                    z = 'M';
+                    x = arabStrToInt(strs[0]);
+                    y = arabStrToInt(strs[1]);
+                    z = '-';
                 }
                 if (x == -1 || y == -1) {
                     x = -1;
@@ -235,13 +274,13 @@ public class Main {
           } else     if (input.indexOf("*") > 0) {
             String [] strs = input.split("\\*");
             if (strs.length==2) {
-                x = arabStrToInt(strs[0]);
-                y = arabStrToInt(strs[1]);
-                z = '*';
+                x = rimStrToInt(strs[0]);
+                y = rimStrToInt(strs[1]);
+                z = 'm';
                 if (x == -1 || y == -1) {
-                    x = rimStrToInt(strs[0]);
-                    y = rimStrToInt(strs[1]);
-                    z = 'm';
+                    x = arabStrToInt(strs[0]);
+                    y = arabStrToInt(strs[1]);
+                    z = '*';
                 }
                 if (x == -1 || y == -1) {
                     x = -1;
@@ -252,13 +291,13 @@ public class Main {
            } else  if (input.indexOf("/") > 0) {
             String [] strs = input.split("/");
             if (strs.length==2) {
-                x = arabStrToInt(strs[0]);
-                y = arabStrToInt(strs[1]);
-                z = '/';
+                x = rimStrToInt(strs[0]);
+                y = rimStrToInt(strs[1]);
+                z = 'd';
                 if (x == -1 || y == -1) {
-                    x = rimStrToInt(strs[0]);
-                    y = rimStrToInt(strs[1]);
-                    z = 'd';
+                    x = arabStrToInt(strs[0]);
+                    y = arabStrToInt(strs[1]);
+                    z = '/';
                 }
                 if (x == -1 || y == -1) {
                     x = -1;
@@ -266,8 +305,20 @@ public class Main {
                     z = '|';
                 }
             }
-            } else {
             }
+     //else {  }
+
+     try {
+          if (z=='|') {
+              throw new MyException("");
+          }
+     }
+        catch (MyException e) {
+             //e.printStackTrace();
+             System.out.println("throws Exception //т.к. формат математической операции не удовлетворяет заданию - два операнда и один оператор (+, -, /, *)");
+             System.exit(1);
+         }
+
     return new Members(x,y,z);
     }
 
